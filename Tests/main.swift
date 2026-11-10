@@ -12,6 +12,13 @@ func rejects(_ flow: WorkflowDefinition, _ message: String) {
 }
 
 let inputSettingsSuite = "land.nithi.autoproductive.tests.input." + UUID().uuidString
+let sharedID = UUID()
+let existingAutomation = SavedAutomation(id: sharedID, name: "Existing release automation", kind: .openApp)
+let conflictingTestAutomation = SavedAutomation(id: sharedID, name: "Older test copy", kind: .openApp)
+let testOnlyAutomation = SavedAutomation(name: "Test automation", kind: .openApp)
+let mergedAutomations = AutomationMigration.merge(release: [existingAutomation], test: [conflictingTestAutomation, testOnlyAutomation])
+try check(mergedAutomations.count == 3 && mergedAutomations[0] == existingAutomation && mergedAutomations[1].name == "Older test copy (test copy)" && !mergedAutomations[1].isEnabled && mergedAutomations[2] == testOnlyAutomation, "Conflicting test automations are preserved without enabling duplicate triggers")
+try check(AutomationMigration.merge(release: [existingAutomation], test: [existingAutomation]) == [existingAutomation], "Identical automations are not duplicated")
 let inputSettings = UserDefaults(suiteName: inputSettingsSuite)!
 try check(InputMonitoringSettings.allowsInput(in: inputSettings), "Input monitoring defaults on without requiring a saved toggle preference")
 try check(!InputMonitoringSettings.isAvailable(permissionGranted: false, in: inputSettings), "Input monitoring is off until permission is granted")

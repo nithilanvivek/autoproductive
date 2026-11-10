@@ -143,6 +143,22 @@ final class AppUpdateManager: NSObject, ObservableObject, SPUUpdaterDelegate {
 /// Sparkle's ready-to-install callback supports cancellation without skipping
 /// the version. Keep its standard driver for all other update stages.
 @MainActor private final class CancelableUpdateDriver: SPUStandardUserDriver {
+    override func showUpdateNotFoundWithError(_ error: Error, acknowledgement: @escaping () -> Void) {
+        let reason = (error as NSError).userInfo[SPUNoUpdateFoundReasonKey] as? NSNumber
+        guard let reason, reason.int32Value == SPUNoUpdateFoundReason.onLatestVersion.rawValue ||
+                reason.int32Value == SPUNoUpdateFoundReason.onNewerThanLatestVersion.rawValue else {
+            super.showUpdateNotFoundWithError(error, acknowledgement: acknowledgement)
+            return
+        }
+        let alert = NSAlert()
+        alert.messageText = "You’re up to date!"
+        alert.informativeText = "No updates are available."
+        alert.addButton(withTitle: "OK")
+        NSApp.activate()
+        alert.runModal()
+        acknowledgement()
+    }
+
     override func showReady(toInstallAndRelaunch reply: @escaping (SPUUserUpdateChoice) -> Void) {
         let alert = NSAlert()
         alert.messageText = "Ready to install"

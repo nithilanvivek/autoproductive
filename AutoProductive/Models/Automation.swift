@@ -182,3 +182,25 @@ struct SavedAutomation: Identifiable, Codable, Hashable {
         enabled = try container.decodeIfPresent(Bool.self, forKey: .enabled) ?? true
     }
 }
+
+enum AutomationMigration {
+    /// Preserve both versions of a changed record without enabling duplicate triggers.
+    static func merge(release: [SavedAutomation], test: [SavedAutomation]) -> [SavedAutomation] {
+        var result = release
+        var seen = Dictionary(release.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
+        for automation in test {
+            if let existing = seen[automation.id] {
+                guard existing != automation else { continue }
+                var copy = automation
+                copy.id = UUID()
+                copy.name += " (test copy)"
+                copy.isEnabled = false
+                result.append(copy)
+            } else {
+                result.append(automation)
+                seen[automation.id] = automation
+            }
+        }
+        return result
+    }
+}

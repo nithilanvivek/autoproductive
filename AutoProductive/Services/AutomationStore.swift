@@ -17,8 +17,28 @@ final class AutomationStore: ObservableObject {
     init(defaults: UserDefaults = .standard) {
         self.defaults = defaults
         pendingInputRequest = defaults.bool(forKey: Self.pendingInputRequestKey)
+        migrateTestAutomationsIfNeeded()
         load()
         enforcePermissions()
+    }
+
+    private func migrateTestAutomationsIfNeeded() {
+        let migrationKey = "testAutomationsMigrated.v1"
+        guard Bundle.main.bundleIdentifier == "land.nithi.autoproductive", !defaults.bool(forKey: migrationKey),
+              let testDefaults = UserDefaults(suiteName: "land.nithi.autoproductive.test14") else { return }
+        do {
+            let releaseData = defaults.data(forKey: Self.storageKey)
+            let testData = testDefaults.data(forKey: Self.storageKey)
+            let release = try releaseData.map { try JSONDecoder().decode([SavedAutomation].self, from: $0) } ?? []
+            let test = try testData.map { try JSONDecoder().decode([SavedAutomation].self, from: $0) } ?? []
+            if !test.isEmpty {
+                let merged = AutomationMigration.merge(release: release, test: test)
+                defaults.set(try JSONEncoder().encode(merged), forKey: Self.storageKey)
+            }
+            defaults.set(true, forKey: migrationKey)
+        } catch {
+            DiagnosticJournal.shared.recordError("Automation migration", error)
+        }
     }
 
     func automation(id: UUID) -> SavedAutomation? {
