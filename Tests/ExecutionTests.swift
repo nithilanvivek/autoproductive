@@ -258,7 +258,8 @@ import UniformTypeIdentifiers
         }
         let dateFile = root.appendingPathComponent("date.txt")
         _ = await run([step(.writeFile, dateFile.path, "{{date}}")])
-        expect(ISO8601DateFormatter().date(from: try String(contentsOf: dateFile, encoding: .utf8)) != nil, "Date variables are populated at execution time")
+        let outputDate = try String(contentsOf: dateFile, encoding: .utf8)
+        expect(outputDate.range(of: #"^\d{2}/\d{2}/\d{4}$"#, options: .regularExpression) != nil, "Date variables use day/month/year at execution time")
         let unicodeFolder = root.appendingPathComponent("folder ✓")
         _ = await run([step(.createFolder, unicodeFolder.path), step(.writeFile, unicodeFolder.appendingPathComponent("one.txt").path, "one"), step(.copyFile, unicodeFolder.path, root.appendingPathComponent("folder copy").path)])
         expect(FileManager.default.fileExists(atPath: root.appendingPathComponent("folder copy/one.txt").path), "Folder actions copy nested contents and Unicode paths")

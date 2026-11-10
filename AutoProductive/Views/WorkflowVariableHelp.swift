@@ -1,13 +1,15 @@
 import SwiftUI
 
 struct WorkflowVariableHelp: View {
+    @Binding var dateUTCOffset: String?
     private let values = [
         ("{{input}}", "The text entered in the most recent Ask for text action."),
         ("{{choice}}", "The option selected in the most recent Show a choice menu action."),
         ("{{file}}", "The text contents loaded by the most recent Read a text file action."),
         ("{{output}}", "The output from the most recent Run a shell command or Run AppleScript action."),
         ("{{clipboard}}", "The text currently copied to your clipboard when this action runs."),
-        ("{{date}}", "The date and time this automation run started, in UTC.")
+        ("{{date}}", "The date this automation started, in DD/MM/YYYY format."),
+        ("{{time}}", "The time this automation started, in 12-hour AM/PM format.")
     ]
 
     var body: some View {
@@ -23,7 +25,22 @@ struct WorkflowVariableHelp: View {
                     }
                 }
             }
-            Text("Put the action that supplies a value before the action that uses it. If no value has been supplied yet, that placeholder stays as typed. Clipboard and date are available without an earlier action.")
+            HStack {
+                Text("Time coordinate: UTC")
+                Picker("UTC offset direction", selection: Binding(
+                    get: { (dateUTCOffset ?? "+00:00").hasPrefix("-") ? "-" : "+" },
+                    set: { dateUTCOffset = $0 + String((dateUTCOffset ?? "+00:00").dropFirst()) }
+                )) { Text("+").tag("+"); Text("−").tag("-") }
+                .labelsHidden().frame(width: 65)
+                TextField("00:00", text: Binding(
+                    get: { String((dateUTCOffset ?? "+00:00").dropFirst()) },
+                    set: { dateUTCOffset = ((dateUTCOffset ?? "+00:00").hasPrefix("-") ? "-" : "+") + $0 }
+                )).textFieldStyle(.roundedBorder).frame(width: 70)
+                if WorkflowText.utcOffsetSeconds(dateUTCOffset) == nil {
+                    Text("Use HH:MM, up to 14:00.").foregroundStyle(.red)
+                }
+            }
+            Text("Put the action that supplies a value before the action that uses it. If no value has been supplied yet, that placeholder stays as typed. Clipboard, date and time are available without an earlier action.")
             Text("Example: Ask for text collects “Nithilan”. A later Type text action containing “Hello {{input}}!” types “Hello Nithilan!”.")
             DisclosureGroup("Using these values in scripts") {
                 VStack(alignment: .leading, spacing: 8) {

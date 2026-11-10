@@ -64,7 +64,7 @@ struct WorkflowEditorView: View {
                                 .disabled(!FeatureAvailability.action(action))
                         }
                     }.disabled(flow.steps.count >= 200)
-                    WorkflowVariableHelp()
+                    WorkflowVariableHelp(dateUTCOffset: $flow.dateUTCOffset)
                 }
                 FormSection(title: "Background & Permissions") {
                     Toggle("Start AutoProductive Menu Bar Agent at login", isOn: Binding(get: { backgroundAgent.isEnabled }, set: { backgroundAgent.setEnabled($0) }))

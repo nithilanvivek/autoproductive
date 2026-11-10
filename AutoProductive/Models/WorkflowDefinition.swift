@@ -149,6 +149,8 @@ struct WorkflowDefinition: Codable, Hashable {
     var gestureModifiers: ShortcutModifiers = [.control, .option]
     var interval: Double = 5
     var repeatCount = 1
+    /// Nil keeps the UTC behaviour of existing automations.
+    var dateUTCOffset: String? = nil
     var steps: [WorkflowStep] = [WorkflowStep()]
     /// Nil preserves the single-trigger behavior of existing saved workflows.
     var sequenceTriggers: [SequenceTrigger]? = nil
@@ -214,6 +216,7 @@ struct WorkflowDefinition: Codable, Hashable {
             if !condition { throw WorkflowError.invalid(message) }
         }
         try require((1...100).contains(repeatCount), "Choose 1–100 repetitions.")
+        try require(WorkflowText.utcOffsetSeconds(dateUTCOffset) != nil, "Enter a UTC offset from 00:00 to 14:00, using HH:MM.")
         try require(!steps.isEmpty && steps.count <= 200, "Add 1–200 actions.")
         try require(WorkflowTiming.isValid(interval), "Choose an interval between 0.5 seconds and one day.")
         if let sequenceTriggers { try require(!sequenceTriggers.isEmpty, "Choose at least one trigger.") }
@@ -385,6 +388,31 @@ struct ScreenColor: Equatable, Sendable {
 }
 
 enum WorkflowText {
+    static func utcOffsetSeconds(_ value: String?) -> Int? {
+        let value = value ?? "+00:00"
+        let chars = Array(value)
+        guard chars.count == 6, ["+", "-"].contains(chars[0]), chars[3] == ":",
+              let hours = Int(String(chars[1...2])), let minutes = Int(String(chars[4...5])),
+              (0...14).contains(hours), (0...59).contains(minutes), hours != 14 || minutes == 0 else { return nil }
+        return (chars[0] == "-" ? -1 : 1) * (hours * 3600 + minutes * 60)
+    }
+
+    private static func formatter(utcOffset: String?, format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.timeZone = TimeZone(secondsFromGMT: utcOffsetSeconds(utcOffset) ?? 0)!
+        formatter.dateFormat = format
+        return formatter
+    }
+
+    static func dateString(_ date: Date, utcOffset: String?) -> String {
+        formatter(utcOffset: utcOffset, format: "dd/MM/yyyy").string(from: date)
+    }
+
+    static func timeString(_ date: Date, utcOffset: String?) -> String {
+        formatter(utcOffset: utcOffset, format: "hh:mm a").string(from: date)
+    }
     static func expand(_ text: String, variables: [String: String]) -> String {
         // One pass prevents inserted user text from being interpreted as another variable.
         let regex = try! NSRegularExpression(pattern: "\\{\\{(input|choice|file|output|clipboard|date)\\}\\}")

@@ -278,7 +278,9 @@ final class InputAutomationMonitor {
                     }
                     if insertsText {
                         let template = flow.steps[0].text
-                        var variables = ["date": ISO8601DateFormatter().string(from: .now)]
+                        let started = Date()
+                        var variables = ["date": WorkflowText.dateString(started, utcOffset: flow.dateUTCOffset),
+                                         "time": WorkflowText.timeString(started, utcOffset: flow.dateUTCOffset)]
                         if template.contains("{{clipboard}}") { variables["clipboard"] = NSPasteboard.general.string(forType: .string) ?? "" }
                         let replacement = WorkflowText.expand(template, variables: variables)
                         let output = deletePhrase

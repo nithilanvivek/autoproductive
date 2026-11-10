@@ -181,7 +181,7 @@ struct SequenceEditorView: View {
                 }
             }.disabled(flow.steps.count >= 200)
             Stepper("Repeat the sequence \(flow.repeatCount) time\(flow.repeatCount == 1 ? "" : "s")", value: $flow.repeatCount, in: 1...100)
-            WorkflowVariableHelp()
+            WorkflowVariableHelp(dateUTCOffset: $flow.dateUTCOffset)
         }
     }
 

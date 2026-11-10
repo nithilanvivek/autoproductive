@@ -35,7 +35,11 @@ final class WorkflowEngine: ObservableObject {
         tasks[automation.id] = Task {
             defer { runningIDs.remove(automation.id); tasks[automation.id] = nil; activeProcesses[automation.id] = nil }
             do {
-                var variables: [String: String] = ["date": ISO8601DateFormatter().string(from: .now)]
+                let started = Date()
+                var variables: [String: String] = [
+                    "date": WorkflowText.dateString(started, utcOffset: workflow.dateUTCOffset),
+                    "time": WorkflowText.timeString(started, utcOffset: workflow.dateUTCOffset)
+                ]
                 for _ in 0..<workflow.repeatCount {
                     for step in workflow.steps {
                         try Task.checkCancellation()
