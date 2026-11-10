@@ -75,6 +75,19 @@ final class ReleaseStub: URLProtocol {
               Set(reduced.packages.map(\.id)) == keep, !FileManager.default.fileExists(atPath: all.directory.path) else {
             fatalError("Removing unselected packages failed")
         }
+        // Reopen the saved generation as a later app launch would, and make
+        // sure the feature-management checkboxes reflect the last change.
+        let reopened = FeaturePackageGenerations(root: root.appendingPathComponent("features"), publicKey: key)
+        guard let reopenedSelection = try reopened.current()?.selection else { fatalError("Saved selection is missing") }
+        let nextVisit = try await FeatureInstallationSession.begin(installer: installer, expected: expected, previous: reopenedSelection)
+        guard nextVisit.initiallySelected == keep else { fatalError("Feature preferences did not reflect deletion") }
+        let reinstalled = keep.union(["action.notification"])
+        try await nextVisit.install(reinstalled)
+        guard let savedAgain = try reopened.current()?.selection, savedAgain.selected == reinstalled else {
+            fatalError("Feature preferences did not reflect installation")
+        }
+        let finalVisit = try await FeatureInstallationSession.begin(installer: installer, expected: expected, previous: savedAgain)
+        guard finalVisit.initiallySelected == reinstalled else { fatalError("Reinstalled feature was not selected on the next visit") }
         print("Passed real \(version) catalogue installation, action execution and feature removal in isolated storage.")
     }
 }
