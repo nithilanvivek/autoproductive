@@ -1,4 +1,5 @@
 import SwiftUI
+import ServiceManagement
 
 struct HomeView: View {
     @EnvironmentObject private var store: AutomationStore
@@ -51,7 +52,7 @@ struct HomeView: View {
                     .padding(.bottom, 16)
                 }
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 155), spacing: 12)], spacing: 12) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 12)], spacing: 12) {
                     if let featuresAction {
                         Button(action: featuresAction) {
                             Label("Install/Delete Features", systemImage: "square.stack.3d.up")
@@ -59,6 +60,11 @@ struct HomeView: View {
                     }
                     Button { updates.checkNow() } label: {
                         Label("Check for Updates", systemImage: "arrow.triangle.2.circlepath")
+                    }
+                    Button { ProblemReportCoordinator.shared.show() } label: {
+                        Label("Report Bug / Give Feedback", systemImage: "bubble.left.and.bubble.right")
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                     Button { FileBucket.shared.showWindow() } label: {
                         Label { Text("Open File Bucket") } icon: {
@@ -72,6 +78,7 @@ struct HomeView: View {
                     }
                 }
                 .buttonStyle(.bordered)
+                .tint(AppPalette.textAccent)
                 .padding(14)
                 .frame(maxWidth: 760)
                 .glassCard()
@@ -142,7 +149,7 @@ struct HomeView: View {
                     HStack(spacing: 12) {
                         Image(systemName: "menubar.rectangle")
                             .frame(width: 32, height: 32)
-                            .foregroundStyle(AppPalette.blue)
+                            .foregroundStyle(AppPalette.textAccent)
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Want the robot menu and automation triggers ready after login?")
                                 .font(.system(size: 13, weight: .semibold))
@@ -156,6 +163,7 @@ struct HomeView: View {
                             if !backgroundAgent.isEnabled {
                                 loginRequestError = backgroundAgent.errorMessage ?? "Start at Login could not be enabled."
                             }
+                            SMAppService.openSystemSettingsLoginItems()
                         }
                         .buttonStyle(.bordered)
                         .controlSize(.small)

@@ -105,7 +105,7 @@ struct RootView: View {
             }
         }
         .background(MenuBarInstallationView())
-        .tint(AppPalette.blue)
+        .tint(AppPalette.textAccent)
         .onAppear {
             followMenuRequest()
             if !AutoProductiveAppDelegate.isMenuBarAgentLaunch, path.isEmpty, AutomationDraftStorage.load() != nil {

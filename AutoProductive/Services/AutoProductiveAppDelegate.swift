@@ -1,15 +1,20 @@
 import AppKit
+import Combine
 import UserNotifications
 
 @MainActor
 final class AutoProductiveAppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDelegate {
     private var reopenObserver: NSObjectProtocol?
+    private var automationObserver: AnyCancellable?
     static var isMenuBarAgentLaunch: Bool {
         ProcessInfo.processInfo.arguments.contains("--menu-bar-agent")
     }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         UNUserNotificationCenter.current().delegate = self
+        // The login agent must schedule automations even if no app window appears.
+        let runtime = AutomationRuntime.shared
+        automationObserver = AutomationStore.shared.$automations.sink { runtime.sync($0) }
         ProblemReportCoordinator.shared.startSession()
         reopenObserver = DistributedNotificationCenter.default().addObserver(
             forName: AppInstanceGuard.showMainWindow, object: nil, queue: .main

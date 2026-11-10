@@ -16,7 +16,6 @@ final class MenuBarController: NSObject {
     private var maximumHeight: CGFloat = 550
     private var fittedHeight: CGFloat?
     private var keepAwakeObserver: AnyCancellable?
-    private var automationObserver: AnyCancellable?
     private var globalMouseMonitor: Any?
     private var localMonitor: Any?
 
@@ -24,8 +23,6 @@ final class MenuBarController: NSObject {
                  content: @escaping (NSSize, CGFloat) -> AnyView) {
         self.content = content
         guard statusItem == nil else { return }
-        // Keep triggers synchronized even after the main window is closed.
-        automationObserver = store.$automations.sink { runtime.sync($0) }
         let item = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         item.autosaveName = "AutoProductiveRobot"
         item.button?.target = self

@@ -11,6 +11,7 @@ final class InputAutomationMonitor {
     private var automations: [SavedAutomation] = []
     private var textBuffer = TextTriggerBuffer()
     private var lastTextTarget: AXUIElement?
+    private var secureFocusDetected = false
     private var activeRemaps: [Int: KeyboardShortcutDefinition] = [:]
     private var consumedKeys = Set<Int>()
     private var lastApp: pid_t = 0
@@ -233,13 +234,19 @@ final class InputAutomationMonitor {
         }
         let textTriggers = eligible.filter { $0.workflow?.uses(.textExpansion) == true }
         guard !textTriggers.isEmpty, let app,
-              app.bundleIdentifier != Bundle.main.bundleIdentifier,
-              let textTarget = focusedEditableTextElement(in: app) else {
+              app.bundleIdentifier != Bundle.main.bundleIdentifier else {
             clearTypedContext()
             return Unmanaged.passUnretained(event)
         }
-        reportTextState("listening in an editable field")
-        if let lastTextTarget, !CFEqual(lastTextTarget, textTarget) { textBuffer.clear() }
+        let textTarget = focusedEditableTextElement(in: app)
+        guard !secureFocusDetected else {
+            clearTypedContext()
+            return Unmanaged.passUnretained(event)
+        }
+        if textTarget != nil { reportTextState("listening in an editable field") }
+        if let lastTextTarget, let textTarget {
+            if !CFEqual(lastTextTarget, textTarget) { textBuffer.clear() }
+        } else if (lastTextTarget == nil) != (textTarget == nil) { textBuffer.clear() }
         lastTextTarget = textTarget
         // A plain Backspace edits the same bounded phrase context. Navigation,
         // modified deletion, focus changes and mouse clicks still invalidate it.
@@ -261,17 +268,24 @@ final class InputAutomationMonitor {
             let count = matchedLength - (flow.requiresDelimiter ? 0 : characters.count)
             reportTextState("matched a saved trigger")
             let insertsText = flow.steps.count == 1 && flow.steps[0].action == .typeText
-            let deletePhrase = flow.shouldDeleteTriggerText
-            let suppressCurrentKey = deletePhrase || insertsText
+            let policy = TextTriggerExecutionPolicy(deleteRequested: flow.shouldDeleteTriggerText,
+                                                    insertsText: insertsText, hasEditableTarget: textTarget != nil)
+            let deletePhrase = policy.deletePhrase
+            let suppressCurrentKey = policy.suppressCurrentKey
             if suppressCurrentKey { consumedKeys.insert(code) }
             clearTypedContext()
             expansionTask?.cancel()
             expansionTask = Task {
                 do {
-                    if deletePhrase || insertsText {
-                        guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier,
-                              let currentTarget = focusedEditableTextElement(in: app),
-                              CFEqual(currentTarget, textTarget) else { return }
+                    guard !IsSecureEventInputEnabled(),
+                          NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier else { return }
+                    if let textTarget, deletePhrase || insertsText {
+                        guard let currentTarget = focusedEditableTextElement(in: app),
+                              !secureFocusDetected, CFEqual(currentTarget, textTarget) else { return }
+                    } else if textTarget == nil {
+                        // A field may have become secure after the matching key.
+                        _ = focusedEditableTextElement(in: app)
+                        guard !secureFocusDetected, !IsSecureEventInputEnabled() else { return }
                     }
                     if deletePhrase {
                         for _ in 0..<max(0, count) { try DesktopAutomationService.press(.init(keyCode: 51, keyLabel: "Delete", modifiers: [])) }
@@ -285,7 +299,7 @@ final class InputAutomationMonitor {
                         let replacement = WorkflowText.expand(template, variables: variables)
                         let output = deletePhrase
                             ? replacement + (flow.requiresDelimiter ? characters : "")
-                            : characters + replacement
+                            : (suppressCurrentKey ? characters : "") + replacement
                         try await DesktopAutomationService.type(output)
                     } else {
                         WorkflowEngine.shared.start(automation)
@@ -314,11 +328,13 @@ final class InputAutomationMonitor {
 
     /// Fail closed when the focused app cannot identify an editable text target.
     private func focusedEditableTextElement(in app: NSRunningApplication) -> AXUIElement? {
+        secureFocusDetected = false
         let application = AXUIElementCreateApplication(app.processIdentifier)
         AXUIElementSetMessagingTimeout(application, 0.05)
         var focusedValue: CFTypeRef?
         let focusResult = AXUIElementCopyAttributeValue(application, kAXFocusedUIElementAttribute as CFString, &focusedValue)
         var fallbackResult: AXError?
+        var focusOwnership = "unavailable"
         if focusResult != .success || focusedValue == nil {
             // Some native/web hosts don't publish focus on their application
             // element, although the system-wide focus element remains available.
@@ -331,20 +347,20 @@ final class InputAutomationMonitor {
                let systemFocus, CFGetTypeID(systemFocus) == AXUIElementGetTypeID() {
                 let candidate = systemFocus as! AXUIElement
                 var owner: pid_t = 0
-                if AXUIElementGetPid(candidate, &owner) == .success,
-                   owner == app.processIdentifier,
-                   NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier {
-                    focusedValue = systemFocus
-                }
+                let ownerResult = AXUIElementGetPid(candidate, &owner)
+                let sameOwner = ownerResult == .success && owner == app.processIdentifier
+                let sameForeground = NSWorkspace.shared.frontmostApplication?.processIdentifier == app.processIdentifier
+                focusOwnership = "ownerMatch=\(sameOwner), foregroundMatch=\(sameForeground)"
+                if sameOwner && sameForeground { focusedValue = systemFocus }
             }
         }
         guard let focusedValue, CFGetTypeID(focusedValue) == AXUIElementGetTypeID() else {
-            reportTextState("focused field unavailable (app \(focusResult.rawValue), system \(fallbackResult?.rawValue ?? 0))")
+            reportTextState("focused field unavailable (app \(focusResult.rawValue), system \(fallbackResult?.rawValue ?? 0), \(focusOwnership))")
             return nil
         }
         let focused = focusedValue as! AXUIElement
         AXUIElementSetMessagingTimeout(focused, 0.05)
-        guard !isSecureTextElement(focused) else { return nil }
+        if isSecureTextElement(focused) { secureFocusDetected = true; return nil }
         if isEditableTextElement(focused) { return focused }
 
         // Web-style editors may focus a child inside a contenteditable container.
@@ -355,7 +371,7 @@ final class InputAutomationMonitor {
            let ancestorValue, CFGetTypeID(ancestorValue) == AXUIElementGetTypeID() {
             let ancestor = ancestorValue as! AXUIElement
             AXUIElementSetMessagingTimeout(ancestor, 0.05)
-            if isSecureTextElement(ancestor) { return nil }
+            if isSecureTextElement(ancestor) { secureFocusDetected = true; return nil }
             if isEditableTextElement(ancestor) { return ancestor }
         }
         // Some web accessibility bridges focus a child and omit EditableAncestor.
@@ -369,7 +385,7 @@ final class InputAutomationMonitor {
             let parent = parentValue as! AXUIElement
             if CFEqual(child, parent) { break }
             AXUIElementSetMessagingTimeout(parent, 0.05)
-            if isSecureTextElement(parent) { return nil }
+            if isSecureTextElement(parent) { secureFocusDetected = true; return nil }
             if isEditableTextElement(parent) { return parent }
             child = parent
         }

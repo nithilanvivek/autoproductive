@@ -57,7 +57,7 @@ struct SequenceEditorView: View {
                         Button { page = stage; error = nil } label: {
                             Text("\(index + 1)  \(stage.rawValue)")
                                 .font(.system(size: 12, weight: stage == page ? .semibold : .regular))
-                                .foregroundStyle(stage == page ? AppPalette.blue : .secondary)
+                                .foregroundStyle(stage == page ? AppPalette.textAccent : .secondary)
                                 .frame(maxWidth: .infinity).padding(.vertical, 9)
                                 .background(stage == page ? AppPalette.blue.opacity(0.12) : .clear, in: RoundedRectangle(cornerRadius: 8))
                                 .contentShape(Rectangle())

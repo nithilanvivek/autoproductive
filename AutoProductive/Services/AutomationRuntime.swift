@@ -6,6 +6,7 @@ import IOKit.hidsystem
 
 @MainActor
 final class AutomationRuntime: ObservableObject {
+    static let shared = AutomationRuntime()
     @Published private(set) var isPaused = false
     @Published private(set) var inputMonitoringEnabled = false
     private let defaults: UserDefaults
@@ -93,9 +94,13 @@ final class AutomationRuntime: ObservableObject {
             lastInputError = error.localizedDescription
             WorkflowEngine.shared.lastError = lastInputError
         }
-        timer = Timer.scheduledTimer(withTimeInterval: WorkflowTiming.minimum, repeats: true) { [weak self] _ in
+        let intervalTimer = Timer(timeInterval: WorkflowTiming.minimum, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated { self?.tick() }
         }
+        // Keep interval and screen triggers ticking while menus and modal panels
+        // run the main loop in a mode other than the default.
+        RunLoop.main.add(intervalTimer, forMode: .common)
+        timer = intervalTimer
     }
 
     func setFinderCutEnabled(_ enabled: Bool) {

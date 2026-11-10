@@ -228,7 +228,7 @@ struct MenuBarView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .controlSize(.small)
-                    .tint(keepAwake.isActive ? .red : AppPalette.blue)
+                    .tint(keepAwake.isActive ? .red : AppPalette.textAccent)
                     .accessibilityLabel(keepAwake.isActive ? "Stop Keep Awake" : "Start Keep Awake")
                 }
                 Text(keepAwake.status).font(.caption).foregroundStyle(.secondary)
@@ -251,7 +251,7 @@ struct MenuBarView: View {
                 }
                 .buttonStyle(.plain)
                 .font(.caption)
-                .foregroundStyle(AppPalette.blue)
+                .foregroundStyle(AppPalette.textAccent)
                 if showCustomTime {
                     VStack(alignment: .leading, spacing: 9) {
                         Picker("Time type", selection: $customMode) {
@@ -564,7 +564,7 @@ struct MenuBarView: View {
             .font(.system(size: 12, weight: .semibold))
             .frame(maxWidth: .infinity)
             .buttonStyle(.bordered)
-            .tint(AppPalette.blue)
+            .tint(AppPalette.textAccent)
             .accessibilityLabel(duration == nil ? "Keep awake until turned off" : "Keep awake for \(title)")
     }
 
@@ -573,7 +573,7 @@ struct MenuBarView: View {
             Label(title, systemImage: systemImage).font(.system(size: 12))
         }
         .controlSize(.small)
-        .tint(AppPalette.blue)
+        .tint(AppPalette.textAccent)
     }
 
     private func card<Content: View>(@ViewBuilder _ content: () -> Content) -> some View {

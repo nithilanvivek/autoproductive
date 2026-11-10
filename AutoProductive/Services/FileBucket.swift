@@ -97,7 +97,7 @@ final class FileBucket: ObservableObject {
             panel.hidesOnDeactivate = false
             panel.level = .floating
             panel.collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary]
-            panel.contentView = NSHostingView(rootView: FileBucketView())
+            panel.contentView = NSHostingView(rootView: FileBucketView().tint(AppPalette.textAccent))
             bucketPanel = panel
         }
         guard let panel = bucketPanel else { return }

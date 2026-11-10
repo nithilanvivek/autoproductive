@@ -78,6 +78,9 @@ struct FeatureComponentDispatcher {
     }
 
     private static func activeGenerations() throws -> FeaturePackageGenerations? {
+        #if AUTOPRODUCTIVE_EXECUTION_TESTS
+        return nil
+        #else
         let root = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appendingPathComponent(FeatureComponentSupport.supportDirectoryName, isDirectory: true)
             .appendingPathComponent("Features", isDirectory: true)
@@ -97,6 +100,7 @@ struct FeatureComponentDispatcher {
         }
         #endif
         return generations
+        #endif
     }
 
     static func requireAction(id: String, title: String, generations: FeaturePackageGenerations?) throws {

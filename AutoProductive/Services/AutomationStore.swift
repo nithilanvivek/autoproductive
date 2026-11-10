@@ -7,6 +7,7 @@ import IOKit.hidsystem
 
 @MainActor
 final class AutomationStore: ObservableObject {
+    static let shared = AutomationStore()
     @Published private(set) var automations: [SavedAutomation] = []
 
     nonisolated static let storageKey = "savedAutomations.v1"

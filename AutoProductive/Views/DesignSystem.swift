@@ -2,6 +2,12 @@ import SwiftUI
 
 enum AppPalette {
     static let blue = Color(red: 0.08, green: 0.43, blue: 0.98)
+    static let textAccent = Color(nsColor: NSColor(name: nil) { appearance in
+        if appearance.bestMatch(from: [.darkAqua, .aqua]) == .darkAqua {
+            return NSColor(srgbRed: 0.62, green: 0.91, blue: 0.79, alpha: 1)
+        }
+        return NSColor(srgbRed: 0.04, green: 0.34, blue: 0.23, alpha: 1)
+    })
     static let indigo = Color(red: 0.39, green: 0.28, blue: 0.94)
     static let mint = Color(red: 0.18, green: 0.78, blue: 0.65)
 }

@@ -32,7 +32,7 @@ final class ProblemReportCoordinator {
         MenuBarController.shared.close()
         if let window, window.isVisible { window.makeKeyAndOrderFront(nil); NSApp.activate(); return }
         let model = ProblemReportModel(crash: crash, diagnostic: diagnostic, sample: sample)
-        let window = NSWindow(contentViewController: NSHostingController(rootView: ProblemReportView(model: model)))
+        let window = NSWindow(contentViewController: NSHostingController(rootView: ProblemReportView(model: model).tint(AppPalette.textAccent)))
         window.title = crash ? "Send Crash Report" : "Report a Problem"
         window.styleMask = [.titled, .closable, .miniaturizable, .resizable]
         window.minSize = NSSize(width: 440, height: 360)

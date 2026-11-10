@@ -33,7 +33,7 @@ struct KeyboardShortcutRecorder: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Text(isRecording ? recordingPrompt : "\(requiresModifiers ? "Shortcut" : "Key"): \(shortcut?.displayText ?? "None")")
                         .font(.caption)
-                        .foregroundStyle(isRecording ? AppPalette.blue : .secondary)
+                        .foregroundStyle(isRecording ? AppPalette.textAccent : .secondary)
                     HStack {
                         Button(isRecording ? "Cancel" : recordTitle) {
                             isRecording ? stopRecording() : startRecording()
@@ -62,7 +62,7 @@ struct KeyboardShortcutRecorder: View {
         HStack(spacing: 12) {
             Image(systemName: "keyboard")
                 .font(.system(size: 20))
-                .foregroundStyle(AppPalette.blue)
+                .foregroundStyle(AppPalette.textAccent)
                 .frame(width: 32)
 
             VStack(alignment: .leading, spacing: 3) {
@@ -70,7 +70,7 @@ struct KeyboardShortcutRecorder: View {
                     .font(.system(size: 15, weight: .medium, design: shortcut == nil ? .default : .monospaced))
                 Text(isRecording ? recordingPrompt : (requiresModifiers ? "Runs the automation when this shortcut is pressed" : "Records a key, with optional modifiers"))
                     .font(.caption)
-                    .foregroundStyle(isRecording ? AppPalette.blue : .secondary)
+                    .foregroundStyle(isRecording ? AppPalette.textAccent : .secondary)
             }
 
             Spacer()
@@ -85,7 +85,7 @@ struct KeyboardShortcutRecorder: View {
                 isRecording ? stopRecording() : startRecording()
             }
             .buttonStyle(.bordered)
-            .tint(isRecording ? AppPalette.blue : nil)
+            .tint(isRecording ? AppPalette.textAccent : nil)
         }
         .padding(14)
         .background(.quaternary.opacity(0.55), in: RoundedRectangle(cornerRadius: 11))

@@ -71,7 +71,7 @@ struct AutomationWizardView: View {
                         } label: {
                             Text("\(index + 1)  \(pages[index].title)")
                                 .font(.system(size: 12, weight: index == pageIndex ? .semibold : .regular))
-                                .foregroundStyle(index == pageIndex ? AppPalette.blue : .secondary)
+                                .foregroundStyle(index == pageIndex ? AppPalette.textAccent : .secondary)
                                 .lineLimit(2).multilineTextAlignment(.center)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
@@ -349,7 +349,7 @@ struct AutomationWizardView: View {
                 VStack(alignment: .leading, spacing: 6) {
                     Label("Tip", systemImage: "lightbulb")
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(AppPalette.blue)
+                        .foregroundStyle(AppPalette.textAccent)
                     Text("If you want to type this without triggering the action, put the phrase in single or double quotes, then delete the quotes.")
                         .font(.caption)
                         .foregroundStyle(.secondary)

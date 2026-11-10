@@ -3,7 +3,7 @@ set -eu
 ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
 TEST_DIR=$(mktemp -d /tmp/autoproductive-execution-tests.XXXXXX)
 trap 'rm -rf "$TEST_DIR"' EXIT
-xcrun swiftc -O -parse-as-library -module-cache-path "$TEST_DIR/cache" \
+xcrun swiftc -O -D AUTOPRODUCTIVE_EXECUTION_TESTS -parse-as-library -module-cache-path "$TEST_DIR/cache" \
   "$ROOT/AutoProductive/Models/FeatureComponentSupport.swift" \
   "$ROOT/AutoProductive/Models/Automation.swift" \
   "$ROOT/AutoProductive/Models/WorkflowDefinition.swift" \

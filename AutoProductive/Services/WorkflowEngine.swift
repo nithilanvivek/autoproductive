@@ -166,7 +166,10 @@ final class WorkflowEngine: ObservableObject {
             let prepared = try await FeatureComponentDispatcher.openTarget(action: "openApp", value: step.text)
             let application = try prepared ?? url(step.text)
             try Task.checkCancellation()
-            _ = try await NSWorkspace.shared.openApplication(at: application, configuration: .init())
+            let configuration = NSWorkspace.OpenConfiguration()
+            configuration.activates = true
+            let opened = try await NSWorkspace.shared.openApplication(at: application, configuration: configuration)
+            _ = opened.activate()
         case .composeMail:
             let prepared = try await FeatureComponentDispatcher.openTarget(action: "composeMail", value: step.text, subject: step.option, body: step.secondaryText)
             var components = URLComponents()

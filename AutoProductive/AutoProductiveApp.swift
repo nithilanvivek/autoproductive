@@ -3,8 +3,8 @@ import SwiftUI
 struct AutoProductiveApp: App {
     private let instanceGuard = AppInstanceGuard()
     @NSApplicationDelegateAdaptor(AutoProductiveAppDelegate.self) private var appDelegate
-    @StateObject private var store = AutomationStore()
-    @StateObject private var runtime = AutomationRuntime()
+    @StateObject private var store = AutomationStore.shared
+    @StateObject private var runtime = AutomationRuntime.shared
     @StateObject private var backgroundAgent = BackgroundAgentManager()
     @StateObject private var navigation = AppNavigation()
     @StateObject private var keepAwake = KeepAwakeManager.shared
@@ -15,6 +15,7 @@ struct AutoProductiveApp: App {
     var body: some Scene {
         Window("AutoProductive", id: "main") {
             RootView()
+                .tint(AppPalette.textAccent)
                 .environmentObject(store)
                 .environmentObject(backgroundAgent)
                 .environmentObject(siriPresenter)
@@ -39,11 +40,12 @@ struct AutoProductiveApp: App {
         .defaultSize(width: 980, height: 680)
         Window("Keep Awake", id: "keep-awake") {
             KeepAwakeSettingsView()
+                .tint(AppPalette.textAccent)
                 .environmentObject(keepAwake)
         }
         .windowStyle(.hiddenTitleBar)
         Window("Audio Mixer", id: "audio-mixer") {
-            AudioMixerView()
+            AudioMixerView().tint(AppPalette.textAccent)
         }
         .defaultSize(width: 670, height: 500)
         .commands {

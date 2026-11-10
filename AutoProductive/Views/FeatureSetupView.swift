@@ -109,7 +109,7 @@ struct FeatureSetupView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             HStack {
                                 Text(tool.title).font(.headline)
-                                if newFeatureIDs.contains(tool.packageID) { Text("New").font(.caption.weight(.semibold)).foregroundStyle(AppPalette.blue) }
+                                if newFeatureIDs.contains(tool.packageID) { Text("New").font(.caption.weight(.semibold)).foregroundStyle(AppPalette.textAccent) }
                             }
                             Text(tool.explanation).font(.callout).foregroundStyle(.secondary)
                         }
@@ -136,7 +136,7 @@ struct FeatureSetupView: View {
                         VStack(alignment: .leading, spacing: 3) {
                             HStack {
                                 Text(action.title).font(.headline)
-                                if newFeatureIDs.contains(action.packageID) { Text("New").font(.caption.weight(.semibold)).foregroundStyle(AppPalette.blue) }
+                                if newFeatureIDs.contains(action.packageID) { Text("New").font(.caption.weight(.semibold)).foregroundStyle(AppPalette.textAccent) }
                             }
                             Text(action.featureExplanation).font(.callout).foregroundStyle(.secondary)
                         }

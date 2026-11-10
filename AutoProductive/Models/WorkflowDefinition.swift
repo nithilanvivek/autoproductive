@@ -415,7 +415,7 @@ enum WorkflowText {
     }
     static func expand(_ text: String, variables: [String: String]) -> String {
         // One pass prevents inserted user text from being interpreted as another variable.
-        let regex = try! NSRegularExpression(pattern: "\\{\\{(input|choice|file|output|clipboard|date)\\}\\}")
+        let regex = try! NSRegularExpression(pattern: "\\{\\{(input|choice|file|output|clipboard|date|time)\\}\\}")
         let source = text as NSString
         var result = text
         for match in regex.matches(in: text, range: NSRange(location: 0, length: source.length)).reversed() {
@@ -430,6 +430,16 @@ enum WorkflowText {
         ClipboardTransform.apply(text, using: operation)
     }
     #endif
+}
+
+/// Only edit or suppress a typed phrase when its destination is verified.
+struct TextTriggerExecutionPolicy {
+    let deletePhrase: Bool
+    let suppressCurrentKey: Bool
+    init(deleteRequested: Bool, insertsText: Bool, hasEditableTarget: Bool) {
+        deletePhrase = deleteRequested && hasEditableTarget
+        suppressCurrentKey = hasEditableTarget && (deleteRequested || insertsText)
+    }
 }
 
 struct TextTriggerBuffer {

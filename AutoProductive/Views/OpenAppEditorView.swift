@@ -72,7 +72,7 @@ struct OpenAppEditorView: View {
                                 } else {
                                     Image(systemName: "app.dashed")
                                         .font(.system(size: 23))
-                                        .foregroundStyle(AppPalette.blue)
+                                        .foregroundStyle(AppPalette.textAccent)
                                 }
                             }
                             .frame(width: 36, height: 36)
@@ -90,7 +90,7 @@ struct OpenAppEditorView: View {
                             Spacer()
                             Text("Choose…")
                                 .font(.system(size: 13, weight: .semibold))
-                                .foregroundStyle(AppPalette.blue)
+                                .foregroundStyle(AppPalette.textAccent)
                         }
                         .padding(14)
                         .background(.quaternary.opacity(0.55), in: RoundedRectangle(cornerRadius: 11))
