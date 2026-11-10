@@ -1,6 +1,6 @@
 import Foundation
 
-enum AutomationWizardStage: Hashable {
+enum AutomationWizardStage: String, Hashable {
     case application, recipient, mailMessage, phrase, sourceInput, destinationKey
     case gesture, gestureModifiers, windowLayout, operation, scriptLanguage, dialogType
     case details, followUp, condition, monitoring, actions, runOptions, scope, review

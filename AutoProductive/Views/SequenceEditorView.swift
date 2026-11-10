@@ -85,6 +85,12 @@ struct SequenceEditorView: View {
             }
         }
         .navigationTitle(original == nil ? "New Sequence" : "Edit Sequence")
+        .onAppear { restoreDraft() }
+        .onChange(of: flow) { _, _ in saveDraft() }
+        .onChange(of: name) { _, _ in saveDraft() }
+        .onChange(of: shortcut) { _, _ in saveDraft() }
+        .onChange(of: page) { _, _ in saveDraft() }
+        .onChange(of: limitToApps) { _, _ in saveDraft() }
         .onChange(of: missing) { _, value in
             if value.isEmpty && page == .permissions { page = .scope }
         }
@@ -267,9 +273,24 @@ struct SequenceEditorView: View {
 
     private func persist(_ saved: SavedAutomation) {
         store.save(saved)
+        AutomationDraftStorage.clear()
         AutoProductiveShortcuts.updateAppShortcutParameters()
         if saved.siriEnabled {
             siriPresenter.presentAddSheet(for: saved) { dismiss() }
         } else { dismiss() }
+    }
+
+    private func restoreDraft() {
+        guard let draft = AutomationDraftStorage.load(), draft.editor == .sequence,
+              draft.originalID == original?.id else { return }
+        flow = draft.flow; name = draft.name; shortcut = draft.shortcut
+        limitToApps = draft.limitToApps
+        if let savedPage = draft.page.flatMap(SequenceCreationStage.init(rawValue:)), pages.contains(savedPage) { page = savedPage }
+    }
+
+    private func saveDraft() {
+        AutomationDraftStorage.save(AutomationDraft(editor: .sequence, kind: .sequence, originalID: original?.id,
+                                                    name: name, flow: flow, shortcut: shortcut, page: page.rawValue,
+                                                    limitToApps: limitToApps))
     }
 }

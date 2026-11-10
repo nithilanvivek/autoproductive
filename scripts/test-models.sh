@@ -5,6 +5,7 @@ TEST_DIR=$(mktemp -d /tmp/autoproductive-tests.XXXXXX)
 trap 'rm -rf "$TEST_DIR"' EXIT
 xcrun swiftc -module-cache-path "$TEST_DIR/cache" \
   "$ROOT/AutoProductive/Models/Automation.swift" \
+  "$ROOT/AutoProductive/Models/AutomationDraft.swift" \
   "$ROOT/AutoProductive/Models/WorkflowDefinition.swift" \
   "$ROOT/AutoProductive/Models/FeatureCatalog.swift" \
   "$ROOT/AutoProductive/Models/FeatureComponentSupport.swift" \

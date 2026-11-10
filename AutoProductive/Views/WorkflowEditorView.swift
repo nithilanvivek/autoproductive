@@ -85,12 +85,19 @@ struct WorkflowEditorView: View {
                     Text("Saved locally on this Mac.").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
-                Button("Cancel") { dismiss() }.keyboardShortcut(.cancelAction)
+                Button("Cancel") { AutomationDraftStorage.clear(); dismiss() }.keyboardShortcut(.cancelAction)
                 Button("Save Automation", action: save).buttonStyle(PrimaryButtonStyle()).keyboardShortcut(.defaultAction)
                     .disabled(name.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             }
         }
         .navigationTitle(kind.title)
+        .onAppear {
+            guard let draft = AutomationDraftStorage.load(), draft.editor == .workflow, draft.originalID == original?.id else { return }
+            name = draft.name; flow = draft.flow; shortcut = draft.shortcut
+        }
+        .onChange(of: name) { _, _ in saveDraft() }
+        .onChange(of: flow) { _, _ in saveDraft() }
+        .onChange(of: shortcut) { _, _ in saveDraft() }
     }
 
     @ViewBuilder private var triggerFields: some View {
@@ -140,8 +147,13 @@ struct WorkflowEditorView: View {
             var automation = SavedAutomation(id: id, name: name.trimmingCharacters(in: .whitespacesAndNewlines), kind: kind,
                                             keyboardShortcut: flow.trigger == .keyRemap ? nil : shortcut, siriEnabled: original?.siriEnabled ?? false, createdAt: createdAt, workflow: flow)
             automation.appPath = original?.appPath
-            store.save(automation); AutoProductiveShortcuts.updateAppShortcutParameters(); dismiss()
+            store.save(automation); AutomationDraftStorage.clear(); AutoProductiveShortcuts.updateAppShortcutParameters(); dismiss()
         } catch { DiagnosticJournal.shared.recordError("WorkflowEditorView", error); self.error = error.localizedDescription }
+    }
+
+    private func saveDraft() {
+        AutomationDraftStorage.save(AutomationDraft(editor: .workflow, kind: kind, originalID: original?.id,
+                                                    name: name, flow: flow, shortcut: shortcut, page: nil))
     }
 }
 

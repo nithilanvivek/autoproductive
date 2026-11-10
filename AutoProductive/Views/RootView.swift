@@ -8,6 +8,7 @@ enum AppRoute: Hashable {
     case library
     case powerTools
     case edit(UUID)
+    case resumeDraft
 }
 
 struct RootView: View {
@@ -91,6 +92,15 @@ struct RootView: View {
                             description: Text("It may have been deleted.")
                         )
                     }
+                case .resumeDraft:
+                    if let draft = AutomationDraftStorage.load() {
+                        if draft.editor == .wizard { AutomationWizardView(kind: draft.kind) }
+                        else if draft.editor == .workflow, let id = draft.originalID, let automation = store.automation(id: id) {
+                            WorkflowEditorView(kind: draft.kind, existing: automation)
+                        } else {
+                            SequenceEditorView(existing: draft.originalID.flatMap { store.automation(id: $0) })
+                        }
+                    }
                 }
             }
         }
@@ -98,6 +108,9 @@ struct RootView: View {
         .tint(AppPalette.blue)
         .onAppear {
             followMenuRequest()
+            if !AutoProductiveAppDelegate.isMenuBarAgentLaunch, path.isEmpty, AutomationDraftStorage.load() != nil {
+                path.append(.resumeDraft)
+            }
             if AutoProductiveAppDelegate.isMenuBarAgentLaunch {
                 DispatchQueue.main.async {
                     NSApp.windows.first(where: { $0.title == "AutoProductive" })?.orderOut(nil)

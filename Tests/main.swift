@@ -12,6 +12,16 @@ func rejects(_ flow: WorkflowDefinition, _ message: String) {
 }
 
 let inputSettingsSuite = "land.nithi.autoproductive.tests.input." + UUID().uuidString
+let draftSuite = "land.nithi.autoproductive.tests.draft." + UUID().uuidString
+let draftDefaults = UserDefaults(suiteName: draftSuite)!
+var unfinishedFlow = WorkflowDefinition()
+unfinishedFlow.steps = [WorkflowStep(action: .notification, text: "Unfinished", secondaryText: "{{time}}")]
+let unfinished = AutomationDraft(editor: .sequence, kind: .sequence, originalID: nil, name: "Draft", flow: unfinishedFlow, shortcut: nil, page: "Actions")
+AutomationDraftStorage.save(unfinished, defaults: draftDefaults)
+try check(AutomationDraftStorage.load(defaults: UserDefaults(suiteName: draftSuite)!) == unfinished, "An unfinished automation survives reopening its preferences")
+AutomationDraftStorage.clear(defaults: draftDefaults)
+try check(AutomationDraftStorage.load(defaults: draftDefaults) == nil, "Saving or cancelling removes the editor draft")
+draftDefaults.removePersistentDomain(forName: draftSuite)
 let sharedID = UUID()
 let existingAutomation = SavedAutomation(id: sharedID, name: "Existing release automation", kind: .openApp)
 let conflictingTestAutomation = SavedAutomation(id: sharedID, name: "Older test copy", kind: .openApp)

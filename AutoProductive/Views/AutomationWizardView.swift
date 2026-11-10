@@ -127,6 +127,18 @@ struct AutomationWizardView: View {
             }
         }
         .navigationTitle("New \(kind.title)")
+        .onAppear { restoreDraft() }
+        .onChange(of: name) { _, _ in saveDraft() }
+        .onChange(of: flow) { _, _ in saveDraft() }
+        .onChange(of: page) { _, _ in saveDraft() }
+        .onChange(of: shortcut) { _, _ in saveDraft() }
+        .onChange(of: appPath) { _, _ in saveDraft() }
+        .onChange(of: recipient) { _, _ in saveDraft() }
+        .onChange(of: subject) { _, _ in saveDraft() }
+        .onChange(of: message) { _, _ in saveDraft() }
+        .onChange(of: limitToApp) { _, _ in saveDraft() }
+        .onChange(of: appScopes) { _, _ in saveDraft() }
+        .onChange(of: enableTrigger) { _, _ in saveDraft() }
     }
 
     private var applicationPage: some View {
@@ -676,6 +688,7 @@ struct AutomationWizardView: View {
                                              workflow: savedFlow)
             }
             store.save(automation)
+            AutomationDraftStorage.clear()
             if kind == .openApp || kind == .composeMail {
                 AutoProductiveShortcuts.updateAppShortcutParameters()
             }
@@ -683,6 +696,20 @@ struct AutomationWizardView: View {
         } catch {
             DiagnosticJournal.shared.recordError("AutomationWizardView", error); errorMessage = error.localizedDescription
         }
+    }
+
+    private func restoreDraft() {
+        guard let draft = AutomationDraftStorage.load(), draft.editor == .wizard, draft.kind == kind else { return }
+        name = draft.name; flow = draft.flow; shortcut = draft.shortcut
+        appPath = draft.appPath; recipient = draft.recipient; subject = draft.subject; message = draft.message
+        limitToApp = draft.limitToApps; appScopes = draft.appScopes; enableTrigger = draft.enableTrigger
+        if let saved = draft.page.flatMap(AutomationWizardStage.init(rawValue:)), pages.contains(where: { $0.id == saved }) { page = saved }
+    }
+
+    private func saveDraft() {
+        AutomationDraftStorage.save(AutomationDraft(editor: .wizard, kind: kind, originalID: nil, name: name,
+            flow: flow, shortcut: shortcut, page: page.rawValue, limitToApps: limitToApp, appPath: appPath,
+            recipient: recipient, subject: subject, message: message, appScopes: appScopes, enableTrigger: enableTrigger))
     }
 }
 
