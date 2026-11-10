@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleDevelopmentRegion</key>
+    <string>$(DEVELOPMENT_LANGUAGE)</string>
+    <key>CFBundleDisplayName</key>
+    <string>AutoProductive</string>
+    <key>CFBundleExecutable</key>
+    <string>$(EXECUTABLE_NAME)</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundleIconName</key>
+    <string>AppIcon</string>
+    <key>CFBundleIdentifier</key>
+    <string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleName</key>
+    <string>$(PRODUCT_NAME)</string>
+    <key>CFBundlePackageType</key>
+    <string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+    <key>CFBundleShortVersionString</key>
+    <string>$(MARKETING_VERSION)</string>
+    <key>CFBundleVersion</key>
+    <string>$(CURRENT_PROJECT_VERSION)</string>
+    <key>LSApplicationCategoryType</key>
+    <string>public.app-category.productivity</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>$(MACOSX_DEPLOYMENT_TARGET)</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Nithilan Vivek.</string>
+    <key>NSSiriUsageDescription</key>
+    <string>AutoProductive uses Siri to run only the automations you choose.</string>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>AutoProductive needs access to an app's audio only when you adjust its volume below or above 100% in Audio Mixer. Audio is processed on this Mac and never saved.</string>
+    <key>NSAppleEventsUsageDescription</key>
+    <string>AutoProductive uses Automation for actions you request, including reading Finder’s selected files and folders for the Add to File Bucket shortcut.</string>
+    <key>SUFeedURL</key>
+    <string>https://nithi.land/apps/autoproductive/appcast.xml</string>
+    <key>SUPublicEDKey</key>
+    <string>27rp7RHCZC6q3empxc5joW1ELj5Xh30oZ2ckV1xcHKY=</string>
+    <key>SUVerifyUpdateBeforeExtraction</key>
+    <true/>
+    <key>SURequireSignedFeed</key>
+    <true/>
+    <key>SUEnableAutomaticChecks</key>
+    <false/>
+    <key>NSUserActivityTypes</key>
+    <array>
+        <string>land.nithi.autoproductive.open-app</string>
+        <string>land.nithi.autoproductive.compose-mail</string>
+        <string>land.nithi.autoproductive.run-sequence</string>
+    </array>
+</dict>
+</plist>
