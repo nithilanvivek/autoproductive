@@ -4,6 +4,18 @@ AutoProductive combines configurable automations with productivity tools for mac
 
 Download and learn more at [nithi.land](https://nithi.land/projects/autoproductive/). The [privacy policy](https://nithi.land/privacy/autoproductive/) describes local data, permissions, updates and optional problem reports.
 
+## VirusTotal report
+
+The [VirusTotal report for the AutoProductive 1.0 DMG](https://www.virustotal.com/gui/file/5e7f85b343fe4d1b7577cd80ccb8be3ea71b26908d66d8959806dcfce55a4e2b?nocache=1) corresponds to the [1.0 release download](https://github.com/nithilanvivek/autoproductive/releases/tag/v1.0).
+
+SHA-256: `5e7f85b343fe4d1b7577cd80ccb8be3ea71b26908d66d8959806dcfce55a4e2b`
+
+On macOS, compare the download's checksum with the value above by running:
+
+```sh
+shasum -a 256 ~/Downloads/AutoProductive-1.0.dmg
+```
+
 ## See AutoProductive in action
 
 ### Open an app by typing it anywhere
