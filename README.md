@@ -15,8 +15,8 @@ Download and learn more at [nithi.land](https://nithi.land/projects/autoproducti
 ### Switching browser windows
 ![Switching between browser windows](docs/demonstrations/example-3.gif)
 
-### Working in Finder
-![An automation using Finder](docs/demonstrations/example-4.gif)
+### Cmd + X in Finder
+![Cutting and moving a file with Cmd + X in Finder](docs/demonstrations/example-4.gif)
 
 ### Audio Mixer
 ![Adjusting app volumes in Audio Mixer](docs/demonstrations/example-5.gif)
