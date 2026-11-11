@@ -3,7 +3,7 @@ import Foundation
 enum FeatureComponentSupport {
     /// The 1.3-test UI uses the unchanged, signed 1.1 components.
     static func componentVersion(for appVersion: String) -> String {
-        if appVersion == "1.0" { return "1.0-release" }
+        if ["1.0", "1.1"].contains(appVersion) { return "1.0-release" }
         if appVersion == "1.7-test" { return "1.6-test" }
         return ["1.3-test", "1.4-test", "1.5-test"].contains(appVersion) ? "1.1" : appVersion
     }

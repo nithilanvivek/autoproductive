@@ -6,14 +6,14 @@ Download and learn more at [nithi.land](https://nithi.land/projects/autoproducti
 
 ## VirusTotal report
 
-The [VirusTotal report for the AutoProductive 1.0 DMG](https://www.virustotal.com/gui/file/5e7f85b343fe4d1b7577cd80ccb8be3ea71b26908d66d8959806dcfce55a4e2b?nocache=1) corresponds to the [1.0 release download](https://github.com/nithilanvivek/autoproductive/releases/tag/v1.0).
+The [VirusTotal report for the AutoProductive 1.1 DMG](https://www.virustotal.com/gui/file/b710f32c22ecedb58d3aa60de609f2d5d804d449498cdc9b2f435c806327f71e?nocache=1) corresponds to the [1.1 release download](https://github.com/nithilanvivek/autoproductive/releases/tag/v1.1).
 
-SHA-256: `5e7f85b343fe4d1b7577cd80ccb8be3ea71b26908d66d8959806dcfce55a4e2b`
+SHA-256: `b710f32c22ecedb58d3aa60de609f2d5d804d449498cdc9b2f435c806327f71e`
 
 On macOS, compare the download's checksum with the value above by running:
 
 ```sh
-shasum -a 256 ~/Downloads/AutoProductive-1.0.dmg
+shasum -a 256 ~/Downloads/AutoProductive-1.1.dmg
 ```
 
 ## See AutoProductive in action

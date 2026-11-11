@@ -35,6 +35,9 @@ final class MenuBarController: NSObject {
         }
     }
 
+    /// The status item owns a window too; keep it visible when hiding app windows.
+    var statusItemWindow: NSWindow? { statusItem?.button?.window }
+
     func close() {
         panel?.orderOut(nil)
         if let globalMouseMonitor { NSEvent.removeMonitor(globalMouseMonitor) }

@@ -25,6 +25,7 @@ final class ReleaseStub: URLProtocol {
               FeatureComponentSupport.componentVersion(for: "1.5-test") == "1.1",
               FeatureComponentSupport.componentVersion(for: "1.7-test") == "1.6-test",
               FeatureComponentSupport.componentVersion(for: "1.0") == "1.0-release",
+              FeatureComponentSupport.componentVersion(for: "1.1") == "1.0-release",
               FeatureComponentSupport.componentVersion(for: "1.2") == "1.2",
               FeatureComponentSupport.componentVersion(for: "1.3") == "1.3" else {
             fatalError("Test-only component version mapping is incorrect")

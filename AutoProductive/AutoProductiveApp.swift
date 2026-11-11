@@ -61,7 +61,8 @@ struct AutoProductiveApp: App {
                 Button("Hide to Menu Bar") {
                     MenuBarController.shared.close()
                     PermissionExplanationPresenter.shared.cancelPendingRequest()
-                    for window in NSApp.windows {
+                    let statusWindow = MenuBarController.shared.statusItemWindow
+                    for window in NSApp.windows where window !== statusWindow {
                         window.orderOut(nil)
                     }
                     NSApp.setActivationPolicy(.accessory)
