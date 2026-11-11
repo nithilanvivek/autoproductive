@@ -9,8 +9,8 @@ Download and learn more at [nithi.land](https://nithi.land/projects/autoproducti
 ### Open an app by typing it anywhere
 ![Opening an app by typing its trigger phrase](docs/demonstrations/example-1.gif)
 
-### Writing an event record
-![An automation while writing an event record](docs/demonstrations/example-2.gif)
+### Text expansion
+![Expanding text while writing an event record](docs/demonstrations/example-2.gif)
 
 ### Switching browser windows
 ![Switching between browser windows](docs/demonstrations/example-3.gif)
