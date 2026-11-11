@@ -6,8 +6,8 @@ Download and learn more at [nithi.land](https://nithi.land/projects/autoproducti
 
 ## See AutoProductive in action
 
-### Automating an email
-![An automation while composing an email](docs/demonstrations/example-1.gif)
+### Open an app by typing it anywhere
+![Opening an app by typing its trigger phrase](docs/demonstrations/example-1.gif)
 
 ### Writing an event record
 ![An automation while writing an event record](docs/demonstrations/example-2.gif)
